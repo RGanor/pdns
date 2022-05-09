@@ -98,6 +98,12 @@ private:
       if (cd.opts.count("useragent")) {
         useragent = cd.opts.at("useragent");
       }
+
+      long maxbody_size = 1048576; // Default to 1 MegaBytes
+      if(cd.opts.count("bodySize")) {
+        maxbody_size = std::atoi(cd.opts.at("bodySize").c_str());
+      }
+
       MiniCurl mc(useragent);
       
       MiniCurl::MiniCurlHeaders mch;
@@ -139,10 +145,10 @@ private:
 
       if (cd.opts.count("source")) {
         ComboAddress src(cd.opts.at("source"));
-        content=mc.getURL(cd.url, mch, rem, &src, timeout);
+        content=mc.getURL(cd.url, mch, maxbody_size, rem, &src, timeout);
       }
       else {
-        content=mc.getURL(cd.url, mch, rem, nullptr, timeout);
+        content=mc.getURL(cd.url, mch, maxbody_size, rem, nullptr, timeout);
       }
       if (cd.opts.count("stringmatch") && content.find(cd.opts.at("stringmatch")) == string::npos) {
         throw std::runtime_error(boost::str(boost::format("unable to match content with `%s`") % cd.opts.at("stringmatch")));
